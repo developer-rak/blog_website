@@ -1,14 +1,15 @@
 import { addDoc, collection } from 'firebase/firestore';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { db, auth } from '../firebase-config';
 import { useNavigate } from 'react-router-dom';
 
-function CreatePost() {
+function CreatePost({ isAuth }) {
   const [title, setTitle] = useState("");
   const [postText, setPostText] = useState("");
 
   const postsCollectionRef = collection(db, "posts")
   let navigate = useNavigate();
+
   const createPost = async () => {
     await addDoc(postsCollectionRef, { 
       title, 
@@ -18,6 +19,12 @@ function CreatePost() {
     navigate("/");
   };
 
+  useEffect(() => {
+    if (!isAuth) {
+      navigate("/login");
+    }
+  }, []);
+
   return (
     <div className='createPostPage'>
       <div className="cpContainer">
@@ -26,8 +33,8 @@ function CreatePost() {
           <label>Title:</label>
           <input 
             placeholder='Title...'
-            onChange={(even) => {
-              setTitle(even.target.value);
+            onChange={(event) => {
+              setTitle(event.target.value);
             }}   
           />
         </div>
@@ -35,12 +42,12 @@ function CreatePost() {
           <label>Post:</label>
           <textarea 
             placeholder='Post...'
-            onChange={(even) => {
-              setPostText(even.target.value);
+            onChange={(event) => {
+              setPostText(event.target.value);
             }}  
           />
         </div>
-        <button>Submit Post</button>
+        <button onClick={createPost}>Submit Post</button>
       </div>
     </div>
   )
